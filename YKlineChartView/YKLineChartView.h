@@ -11,9 +11,11 @@
 @class  YKLineDataSet;
 @interface YKLineChartView : YKLineChartViewBase
 
-
+/** 矩形块的默认宽度*/
 @property (nonatomic,assign)CGFloat candleWidth;
+/** 矩形块的最大宽度*/
 @property (nonatomic,assign)CGFloat candleMaxWidth;
+/** 矩形块的最小宽度*/
 @property (nonatomic,assign)CGFloat candleMinWidth;
 
 @property (nonatomic,assign)BOOL isShowAvgMarkerEnabled;

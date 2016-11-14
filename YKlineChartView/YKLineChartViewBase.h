@@ -23,8 +23,9 @@
 
 @interface YKLineChartViewBase : YKViewBase
 
-
+/** 上面的chart高度所占比例所占比例*/
 @property (nonatomic,assign) CGFloat uperChartHeightScale;
+/** 中间空白的区域高度*/
 @property (nonatomic,assign) CGFloat xAxisHeitht;
 
 @property (nonatomic,strong) UIColor *gridBackgroundColor;

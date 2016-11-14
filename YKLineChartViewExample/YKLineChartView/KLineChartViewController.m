@@ -26,6 +26,8 @@
     for (NSDictionary * dic in sourceArray) {
         
         YKLineEntity * entity = [[YKLineEntity alloc]init];
+        
+        entity.elevation = arc4random() % (65535+1);
         entity.high = [dic[@"high_px"] doubleValue];
         entity.open = [dic[@"open_px"] doubleValue];
         
@@ -60,7 +62,7 @@
     self.klineView.borderWidth = .5;
     self.klineView.candleWidth = 8;
     self.klineView.candleMaxWidth = 30;
-    self.klineView.candleMinWidth = 1;
+    self.klineView.candleMinWidth = 3;
     self.klineView.uperChartHeightScale = 0.7;
     self.klineView.xAxisHeitht = 25;
     self.klineView.delegate = self;

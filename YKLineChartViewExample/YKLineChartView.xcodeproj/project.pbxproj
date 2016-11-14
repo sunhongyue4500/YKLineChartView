@@ -261,6 +261,7 @@
 				TargetAttributes = {
 					E1CF04F81C16C535002974B2 = {
 						CreatedOnToolsVersion = 7.1;
+						DevelopmentTeam = E7A7QY4LZ2;
 					};
 					E1CF05111C16C536002974B2 = {
 						CreatedOnToolsVersion = 7.1;
@@ -474,8 +475,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = E7A7QY4LZ2;
 				INFOPLIST_FILE = YKLineChartView/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.juniorchina.YKLineChartView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -486,8 +488,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = E7A7QY4LZ2;
 				INFOPLIST_FILE = YKLineChartView/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.3;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.juniorchina.YKLineChartView;
 				PRODUCT_NAME = "$(TARGET_NAME)";
