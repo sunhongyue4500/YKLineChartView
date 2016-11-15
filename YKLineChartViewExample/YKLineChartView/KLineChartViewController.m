@@ -61,12 +61,17 @@
     self.klineView.gridBackgroundColor = [UIColor whiteColor];
     self.klineView.borderColor = [UIColor colorWithRed:203/255.0 green:215/255.0 blue:224/255.0 alpha:1.0];
     self.klineView.borderWidth = .5;
+    self.klineView.bottomRectHeight = 10;
     
     self.klineView.candleWidth = 8;
     self.klineView.candleMaxWidth = 30;
     
     self.klineView.uperChartHeightScale = 1;
+    
     self.klineView.xAxisHeitht = 25;
+    self.klineView.xAxisAttributedDic = @{NSFontAttributeName:[UIFont systemFontOfSize:10],
+                                          NSForegroundColorAttributeName:[UIColor whiteColor]};
+    
     self.klineView.delegate = self;
     self.klineView.highlightLineShowEnabled = YES;
     self.klineView.zoomEnabled = YES;
