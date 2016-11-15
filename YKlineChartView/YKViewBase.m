@@ -80,9 +80,9 @@
     {
         [self setChartDimens:bounds.size.width height:bounds.size.height];
         [self notifyDataSetChanged];
-        
     }
 }
+
 -(void) deviceOrientationDidChange:(NSNotification *) notification
 {
     if([UIDevice currentDevice].orientation!=UIDeviceOrientationUnknown)
@@ -187,6 +187,21 @@
     return (_contentRect.origin.y + _contentRect.size.height) >= normalizedY ? YES : NO;
     
 }
+
+/** 只判断横向的Rect是否相交*/
+- (BOOL)isIntersectionXWithRect:(CGRect)rect {
+    if ([self isInBoundsX:(rect.origin.x + rect.size.width)]) return YES;
+    if ([self isInBoundsX:rect.origin.x]) return YES;
+    return NO;
+}
+
+/** 判断rect2是否与rect1 X轴相交*/
+BOOL isXIntersectionWithRect(CGRect rect2, CGRect rect1) {
+    if (rect2.origin.x >= rect1.origin.x && rect2.origin.x <= rect1.origin.x + rect1.size.width ) return YES;
+    if (rect1.origin.x >= rect2.origin.x && rect1.origin.x <= rect2.origin.x + rect2.size.width ) return YES;
+    return NO;
+}
+
 - (CGFloat)contentTop
 {
     return _contentRect.origin.y;

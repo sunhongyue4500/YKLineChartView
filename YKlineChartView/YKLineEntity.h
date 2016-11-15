@@ -23,6 +23,8 @@
 @property (nonatomic,assign)CGFloat preClosePx;
 @property (nonatomic,strong)NSString * rate;
 
+/** 高程点名称*/
+@property (nonatomic, copy) NSString *elevationPointName;
 /** 高程*/
 @property (nonatomic, assign) int elevation;
 

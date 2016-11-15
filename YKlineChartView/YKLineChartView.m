@@ -49,7 +49,6 @@
     return self;
 }
 
-
 - (void)commonInit {
     
     self.candleCoordsScale = 0.f;
@@ -67,21 +66,26 @@
 
 - (void)setStartDrawIndex:(NSInteger)startDrawIndex
 {
-    if (startDrawIndex < 0) {
+    if (startDrawIndex <= 0) {
         startDrawIndex = 0;
-    }
-    if (startDrawIndex + self.countOfshowCandle >= self.dataSet.data.count) {
+    } else  if (startDrawIndex + self.countOfshowCandle >= self.dataSet.data.count) {
         startDrawIndex = self.dataSet.data.count - self.countOfshowCandle;
     }
     _startDrawIndex = startDrawIndex;
+}
+
+- (void)setCandleWidth:(CGFloat)candleWidth {
+    if (candleWidth >= self.candleMaxWidth) _candleWidth = self.candleMaxWidth;
+    else if (candleWidth <= self.candleMinWidth) _candleWidth = self.candleMinWidth;
+    else  _candleWidth = candleWidth;
 }
 
 -(void)setupData:(YKLineDataSet *)dataSet
 {
     self.dataSet = dataSet;
     [self notifyDataSetChanged];
-    
 }
+
 - (void)addDataSetWithArray:(NSArray *)array
 {
     NSArray * tempArray = [self.dataSet.data mutableCopy];
@@ -89,7 +93,7 @@
     [self.dataSet.data addObjectsFromArray:array];
     [self.dataSet.data addObjectsFromArray:tempArray];
     self.startDrawIndex += array.count;
-    [self  setCurrentDataMaxAndMin];
+    [self setCurrentDataMaxAndMin];
     [self setNeedsDisplay];
 }
 
@@ -115,7 +119,7 @@
 }
 
 - (void)drawRect:(CGRect)rect
-{
+{   
     [super drawRect:rect];
     // 只需在数据源变化后再设置
     [self setCurrentDataMaxAndMin];
@@ -129,18 +133,13 @@
         [self drawCandle:optionalContext];
         
     }
-    [self drawLabelPrice:optionalContext];
-    
-    
+    //[self drawLabelPrice:optionalContext];
 }
+
 - (void)drawGridBackground:(CGContextRef)context rect:(CGRect)rect
 {
     [super drawGridBackground:context rect:rect];
-    
 }
-
-
-
 
 - (void)drawAvgMarker:(CGContextRef)context
                  idex:(NSInteger)idex
@@ -222,7 +221,12 @@
     self.candleCoordsScale = (self.uperChartHeightScale * self.contentHeight)/(self.maxPrice-self.minPrice);
     // 下面的图的比例
     self.volumeCoordsScale = (self.contentHeight - (self.uperChartHeightScale * self.contentHeight)-self.xAxisHeitht)/(self.maxVolume - 0);
-    for (NSInteger i = idex ; i < self.dataSet.data.count; i++) {
+    
+    CGRect labelRect = CGRectZero;
+    /** 保存上一次绘制的位置*/
+    CGRect lastRect = CGRectZero;
+    // 只绘制视野范围内的高程点
+    for (NSInteger i = idex ; i < idex + self.countOfshowCandle && i < self.dataSet.data.count; i++) {
         
         YKLineEntity  * entity  = [self.dataSet.data objectAtIndex:i];
         
@@ -233,22 +237,31 @@
         CGFloat left = (self.candleWidth * (i - idex) + self.contentLeft);
         CGFloat startX = left;
         
-        //date
-        //日期
-        if (i > self.startDrawIndex+5 && i < self.dataSet.data.count - 2) {
-            if (i % (NSInteger)(180 / self.candleWidth) == 0) {
-                [self drawline:context startPoint:CGPointMake(startX, self.contentTop) stopPoint:CGPointMake(startX,  (self.uperChartHeightScale * self.contentHeight)+ self.contentTop) color:self.borderColor lineWidth:0.5];
-                [self drawline:context startPoint:CGPointMake(startX, (self.uperChartHeightScale * self.contentHeight)+ self.xAxisHeitht) stopPoint:CGPointMake(startX,self.contentBottom) color:self.borderColor lineWidth:0.5];
-                NSString * date = entity.date;
-                NSDictionary * drawAttributes = self.xAxisAttributedDic?:self.defaultAttributedDic;
-                NSMutableAttributedString * dateStrAtt = [[NSMutableAttributedString alloc]initWithString:date attributes:drawAttributes];
-                CGSize dateStrAttSize = [dateStrAtt size];
-                [self drawLabel:context attributesText:dateStrAtt rect:CGRectMake(startX - dateStrAttSize.width/2,((self.uperChartHeightScale * self.contentHeight)+ self.contentTop), dateStrAttSize.width, dateStrAttSize.height)];
-                
+        if (entity.elevationPointName) {
+            [self drawline:context startPoint:CGPointMake(startX, self.contentTop) stopPoint:CGPointMake(startX,  (self.uperChartHeightScale * self.contentHeight)+ self.contentTop) color:self.borderColor lineWidth:0.5];
+            [self drawline:context startPoint:CGPointMake(startX, (self.uperChartHeightScale * self.contentHeight)+ self.xAxisHeitht) stopPoint:CGPointMake(startX,self.contentBottom) color:self.borderColor lineWidth:0.5];
+            NSString * date = entity.elevationPointName;
+            NSDictionary * drawAttributes = self.xAxisAttributedDic?:self.defaultAttributedDic;
+            NSMutableAttributedString * dateStrAtt = [[NSMutableAttributedString alloc]initWithString:date attributes:drawAttributes];
+            CGSize dateStrAttSize = [dateStrAtt size];
+            double labelStartX = startX - dateStrAttSize.width / 2;
+            double labelEndX = startX + dateStrAttSize.width / 2;
+            // 边界检查
+            // 左边界
+            if (labelStartX < self.contentLeft) {
+                labelStartX = 0;
+            }
+            // 右边界
+            if (labelEndX > self.contentRight) {
+                labelStartX = self.contentRight - dateStrAttSize.width;
+            }
+            labelRect = CGRectMake(labelStartX,((self.uperChartHeightScale * self.contentHeight)+ self.contentTop), dateStrAttSize.width, dateStrAttSize.height);
+            // 相交
+            if (CGRectEqualToRect(lastRect, CGRectZero) || !isXIntersectionWithRect(labelRect, lastRect)) {
+                [self drawLabel:context attributesText:dateStrAtt rect:labelRect];
+                lastRect = labelRect;
             }
         }
-        
-        //UIColor * color = self.dataSet.candleRiseColor;
         
         if (i > 0){
             YKLineEntity * lastEntity = [self.dataSet.data objectAtIndex:i -1];
@@ -259,7 +272,6 @@
             if (entity.elevation > 0 && lastEntity.elevation > 0) {
                 [self drawline:context startPoint:CGPointMake(lastX, lastY5) stopPoint:CGPointMake(startX, y5) color:self.dataSet.avgMA5Color lineWidth:self.dataSet.avgLineWidth];
             }
-            
             
             CGFloat lastY10 = (self.maxPrice - lastEntity.elevation) * self.candleCoordsScale  + self.contentTop;
             CGFloat  y10 = (self.maxPrice - entity.elevation) * self.candleCoordsScale  + self.contentTop;
@@ -278,13 +290,15 @@
         //CGFloat volume = ((entity.volume - 0) * self.volumeCoordsScale);
         //[self drawRect:context rect:CGRectMake(left, self.contentBottom - volume , candleWidth, volume) color:color];
     }
+    
+    
     for (NSInteger i = idex ; i< self.dataSet.data.count; i ++) {
         YKLineEntity  * entity  = [self.dataSet.data objectAtIndex:i];
         
-        CGFloat close = ((self.maxPrice - entity.close) * self.candleCoordsScale) + self.contentTop;
-        CGFloat left = (self.candleWidth * (i - idex) + self.contentLeft) + self.candleWidth / 6.0;
-        CGFloat candleWidth = self.candleWidth - self.candleWidth / 6.0;
-        CGFloat startX = left + candleWidth/2.0 ;
+        CGFloat close = ((self.maxPrice - entity.elevation) * self.candleCoordsScale) + self.contentTop;
+        CGFloat left = (self.candleWidth * (i - idex) + self.contentLeft);
+        //CGFloat candleWidth = self.candleWidth;
+        CGFloat startX = left;
         //十字线
         if (self.highlightLineCurrentEnabled) {
             if (i == self.highlightLineCurrentIndex) {
@@ -303,7 +317,6 @@
             }
         }
     }
-    
     
     if (!self.highlightLineCurrentEnabled) {
         [self drawAvgMarker:context idex:0 isDrawRight:NO];;
@@ -378,9 +391,8 @@
     
     self.highlightLineCurrentEnabled = NO;
     
-    recognizer.scale= recognizer.scale-self.lastPinScale + 1;
+    recognizer.scale= recognizer.scale - self.lastPinScale + 1;
     
-    ;
     self.candleWidth = recognizer.scale * self.candleWidth;
     
     if(self.candleWidth > self.candleMaxWidth){
@@ -403,7 +415,6 @@
     NSLog(@"%ld",(long)self.startDrawIndex);
     
     self.lastPinScale = recognizer.scale;
-    
 }
 
 - (UILongPressGestureRecognizer *)longPressGesture
@@ -414,6 +425,7 @@
     }
     return _longPressGesture;
 }
+
 - (void)handleLongPressGestureAction:(UIPanGestureRecognizer *)recognizer
 {
     if (!self.highlightLineShowEnabled) {
@@ -461,25 +473,27 @@
     [self setNeedsDisplay];
 }
 
+/** 依据元素个数调整间距*/
+- (void)adjustCandleMinWidth {
+    self.candleMinWidth = self.contentWidth / self.dataSet.data.count;
+}
 
+/** 会调用两遍*/
 - (void)notifyDataSetChanged
 {
     [super notifyDataSetChanged];
+    [self adjustCandleMinWidth];
+    self.candleWidth = self.candleMinWidth;
+    // 从起点绘制
     [self setNeedsDisplay];
-    self.startDrawIndex = self.dataSet.data.count - self.countOfshowCandle;
+    self.startDrawIndex = 0;
+    // 调用layoutSubviews
 }
+
 - (void)notifyDeviceOrientationChanged
 {
     [super notifyDeviceOrientationChanged];
-    self.startDrawIndex = self.dataSet.data.count - self.countOfshowCandle;
+    self.startDrawIndex = 0;
 }
-
-/*
- // Only override drawRect: if you perform custom drawing.
- // An empty implementation adversely affects performance during animation.
- - (void)drawRect:(CGRect)rect {
- // Drawing code
- }
- */
 
 @end

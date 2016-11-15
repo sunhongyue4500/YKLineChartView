@@ -30,9 +30,7 @@
         entity.elevation = arc4random() % (65535+1);
         entity.high = [dic[@"high_px"] doubleValue];
         entity.open = [dic[@"open_px"] doubleValue];
-        
         entity.low = [dic[@"low_px"] doubleValue];
-        
         entity.close = [dic[@"close_px"] doubleValue];
         
         entity.date = dic[@"date"];
@@ -40,9 +38,12 @@
         entity.ma10 = [dic[@"avg10"] doubleValue];
         entity.ma20 = [dic[@"avg20"] doubleValue];
         entity.volume = [dic[@"total_volume_trade"] doubleValue];
+    
+        entity.elevationPointName = dic[@"elevationPointName"];
         [array addObject:entity];
         //YTimeLineEntity * entity = [[YTimeLineEntity alloc]init];
     }
+    [array addObjectsFromArray:array];
     [array addObjectsFromArray:array];
     YKLineDataSet * dataset = [[YKLineDataSet alloc]init];
     dataset.data = array;
@@ -56,14 +57,15 @@
     dataset.avgMA20Color = [UIColor colorWithRed:216/255.0 green:192/255.0 blue:44/255.0 alpha:1.0];
     dataset.candleTopBottmLineWidth = 1;
     
-    [self.klineView setupChartOffsetWithLeft:50 top:10 right:10 bottom:10];
+    [self.klineView setupChartOffsetWithLeft:0 top:0 right:0 bottom:10];
     self.klineView.gridBackgroundColor = [UIColor whiteColor];
     self.klineView.borderColor = [UIColor colorWithRed:203/255.0 green:215/255.0 blue:224/255.0 alpha:1.0];
     self.klineView.borderWidth = .5;
+    
     self.klineView.candleWidth = 8;
     self.klineView.candleMaxWidth = 30;
-    self.klineView.candleMinWidth = 3;
-    self.klineView.uperChartHeightScale = 0.7;
+    
+    self.klineView.uperChartHeightScale = 1;
     self.klineView.xAxisHeitht = 25;
     self.klineView.delegate = self;
     self.klineView.highlightLineShowEnabled = YES;

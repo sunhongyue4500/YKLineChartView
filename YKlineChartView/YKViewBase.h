@@ -42,6 +42,10 @@
 
 - (BOOL)isInBoundsBottom:(CGFloat)y;
 
+- (BOOL)isIntersectionXWithRect:(CGRect)rect;
+
+BOOL isXIntersectionWithRect(CGRect rect2, CGRect rect1);
+
 - (CGFloat)contentTop;
 - (CGFloat)contentLeft;
 - (CGFloat)contentRight;
